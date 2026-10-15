@@ -1,0 +1,23 @@
+/* ---------- Biến dùng chung & nền trang ---------- */
+:root {
+    --gold: #f0c674;
+    --gold-soft: #e8d9a8;
+    --gold-deep: #c9962f;
+    --night: #0a0f1e;
+
+    --font-script: 'Dancing Script', cursive;
+    --font-serif: 'Cormorant Garamond', serif;
+    --font-sans: 'Be Vietnam Pro', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--night);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+}

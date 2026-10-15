@@ -1,0 +1,22 @@
+/* ---------- Thanh tiến độ hành trình ---------- */
+.progress {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 2px;
+    width: 100%;
+    background: rgba(240, 198, 116, .12);
+    z-index: 30;
+    opacity: 0;
+    transition: opacity .6s ease;
+}
+.progress.is-visible { opacity: 1; }
+
+.progress__bar {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-deep), var(--gold), #fff3d2);
+    box-shadow: 0 0 10px rgba(240, 198, 116, .8);
+    transition: width .12s linear;
+}

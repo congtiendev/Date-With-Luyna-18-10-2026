@@ -1,0 +1,95 @@
+/* ---------- Đầu tàu đứng trên đường ray ----------
+   Khung .train đúng bằng ảnh thân tàu (1536 × 1024 đơn vị).
+   Lớp bánh xe thu nhỏ còn 64%, hạ xuống và vẽ ĐÈ LÊN thân tàu, sao cho:
+     - đáy bánh nằm ở 84.22% chiều cao khung  -> đó là mặt ray
+     - đỉnh bánh nhô lên qua bệ máy            -> giống đầu máy hơi nước thật
+   Các con số % dưới đây tính ra từ toạ độ ảnh, sửa thì sửa cả cụm.  */
+.train {
+    /* Cỡ đầu tàu — giá trị mặc định, config.js ghi đè bằng train.height.
+       Kẹp thêm theo chiều ngang để trên màn hình dọc tàu không chiếm hết bề ngang. */
+    --train-height: min(32vh, 42vw);
+
+    position: fixed;
+    /* Đoàn tàu nằm lệch trái để bên phải còn chỗ cho nhà ga hiện trọn vẹn
+       khi tàu dừng ở trạm — nếu đặt giữa thì tàu che mất ga.
+       Vế min() giữ mũi tàu không tràn ra ngoài khi màn hình hẹp
+       (1.472 = 98.1% bề ngang khung × tỉ lệ 1536/1024). */
+    left: min(30%, calc(100% - var(--train-height) * 1.472 - 12px));
+    /* Mốc đường ray, mỗi cảnh một khác — train.js đặt qua --rail */
+    --rail: 70.03;
+    top: calc(var(--rail) * 1vh);
+    top: calc(var(--rail) * 1dvh);
+    height: var(--train-height);
+    width: calc(var(--train-height) * 1536 / 1024);
+    transform: translateY(-84.22%);   /* kéo lên sao cho đáy bánh xe chạm ray */
+    z-index: 20;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.2s ease, visibility 1.2s ease, top 1.1s ease;
+}
+.train.is-visible { opacity: 1; visibility: visible; }
+
+.train__layer {
+    position: absolute;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.train__body {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .55));
+}
+
+/* Toa nối phía sau — vị trí do train.js đặt (phụ thuộc số toa),
+   ở đây chỉ khai báo phần dùng chung.
+   Mask cắt bỏ cụm bánh đĩa vẽ sẵn ở đáy ảnh (mép dưới khung gầm nằm ở
+   y = 582/1024 = 56.8%), vì đã thay bằng bánh nan hoa kiểu đầu tàu. */
+.train__carriage {
+    z-index: 0;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .55));
+    mask-image: linear-gradient(to bottom, #000 56.4%, transparent 57.4%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 56.4%, transparent 57.4%);
+}
+
+/* Gầm toa vốn tối gần bằng nền cầu. Lớp này là bản sao cùng vị trí,
+   chỉ lộ dải khung gầm rồi làm sáng lên cho nổi khỏi nền. */
+.train__carriage-lit {
+    filter: brightness(1.8) saturate(1.2);
+    mask-image: linear-gradient(to bottom, transparent 50%, #000 53.5%,
+                                #000 56.4%, transparent 57.4%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 50%, #000 53.5%,
+                                        #000 56.4%, transparent 57.4%);
+    z-index: 0;
+}
+
+/* Bánh toa: cùng bộ khung bánh với đầu tàu nhưng nằm SAU thân toa,
+   chỉ hở đúng nửa dưới — khác đầu tàu là bánh đè lên thân. */
+.train__carriage-wheel { z-index: -1; }
+
+.train__wheel {
+    top: 40.53%;
+    left: 17.98%;
+    width: 64%;
+    height: 64%;
+    z-index: 2;             /* bánh xe đè lên thân tàu */
+}
+
+/* Năm khung bánh chồng lên nhau, chỉ khung hiện hành mới hiện */
+.train__wheel--frame { opacity: 0; }
+.train__wheel--frame.is-current { opacity: 1; }
+
+/* Khung số 5 được vẽ nhỏ hơn bốn khung kia ~3%, chỉnh lại cho bánh khỏi giật */
+.train__wheel--5 { transform: translate(-0.06%, 0.43%) scale(1.031); }
+
+/* Rung nhẹ khi tàu đang lăn bánh */
+.train.is-running .train__body { animation: train-chug .32s ease-in-out infinite; }
+.train.is-running .train__carriage { animation: train-chug .32s ease-in-out .09s infinite; }
+@keyframes train-chug {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-0.45%); }
+}

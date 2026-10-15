@@ -1,0 +1,11 @@
+/* Điểm gom style — thêm component mới thì khai báo thêm một dòng @import */
+@import url('base.css');
+@import url('components/stage.css');
+@import url('components/progress.css');
+@import url('components/guide.css');
+@import url('components/train.css');
+@import url('components/smoke.css');
+@import url('components/control.css');
+@import url('components/modal.css');
+@import url('components/letter.css');
+@import url('components/veil.css');

@@ -1,0 +1,62 @@
+/* ---------- Cột khói trên ống khói ----------
+   .smoke là điểm neo không kích thước, đặt đúng miệng ống khói
+   (x = 1205/1536, y = 138/1024 trong khung .train).
+   Cột khói lùi lại sao cho gốc cột (49.3% × 85% của chính ảnh) cắm vào điểm neo,
+   nhờ vậy khói luôn dính liền ống khói chứ không rời ra.  */
+.smoke {
+    position: absolute;
+    left: 78.45%;
+    top: 13.48%;
+    width: 0;
+    height: 0;
+    z-index: 3;
+    pointer-events: none;
+    /* Xoay quanh chính điểm neo — tức quanh miệng ống khói */
+    transform: rotate(0deg);
+    transition: transform 1.4s cubic-bezier(.3, .7, .3, 1), opacity .7s ease;
+}
+
+/* Dừng ở trạm thì cột khói tan đi, nhường chỗ cho bong bóng kỉ niệm */
+.smoke.is-hidden { opacity: 0; }
+
+/* Tàu chạy thì cả cột ngả về sau */
+.smoke.is-leaning { transform: rotate(var(--lean, -9deg)); }
+
+.smoke__column {
+    --h: calc(var(--train-height) * var(--size, 1));
+    --w: calc(var(--h) * 1024 / 1536);
+
+    position: absolute;
+    height: var(--h);
+    width: var(--w);
+    left: calc(var(--w) * -0.493);
+    top: calc(var(--h) * -0.85);
+
+    transform-origin: 49.3% 85%;   /* gốc cột, trùng miệng ống khói */
+    animation: smoke-sway 9s ease-in-out infinite;
+}
+
+/* Các dáng khói chồng khít lên nhau. Đổi dáng bằng cách NHẢY KHUNG dứt khoát,
+   không mờ chồng — mờ chồng làm hai dáng đè nhau thành hình nhoè đôi.
+   Đây là kiểu "boil" của hoạt hình vẽ tay: mỗi lúc chỉ thấy đúng một nét vẽ. */
+.smoke__frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+.smoke__frame.is-current { opacity: var(--peak, .8); }
+
+/* Cột khói uốn nhẹ và phập phồng, gốc cột đứng yên tại ống khói */
+@keyframes smoke-sway {
+    0%, 100% { transform: rotate(-1.6deg) scaleY(1)     scaleX(1); }
+    35%      { transform: rotate(1.4deg)  scaleY(1.045) scaleX(.98); }
+    70%      { transform: rotate(-.6deg)  scaleY(.975)  scaleX(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .smoke__column { animation: none; }
+}

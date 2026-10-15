@@ -1,0 +1,20 @@
+/* ---------- Lớp sáng phủ lúc chuyển cảnh ---------- */
+.veil {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background:
+        radial-gradient(circle at 50% 48%,
+            rgba(255, 248, 226, .95) 0%,
+            rgba(240, 198, 116, .70) 26%,
+            rgba(28, 44, 92, .92) 62%,
+            rgba(6, 10, 24, 1) 100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 1s ease-in, visibility 1s ease-in;
+}
+.veil.is-on { opacity: 1; visibility: visible; }
+.veil.is-fading {
+    transition: opacity 1.5s ease-out, visibility 1.5s ease-out;
+}

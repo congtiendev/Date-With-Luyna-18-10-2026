@@ -1,0 +1,7 @@
+# Rác của hệ điều hành và trình soạn thảo
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
