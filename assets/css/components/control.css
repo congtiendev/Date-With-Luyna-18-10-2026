@@ -15,7 +15,7 @@
 
     color: var(--gold);
     font-family: var(--font-serif);
-    font-size: clamp(15px, 2.7vw, 20px);
+    font-size: clamp(15px, calc(2.7 * var(--vw)), 20px);
     font-weight: 600;
     letter-spacing: .1em;
     text-transform: uppercase;

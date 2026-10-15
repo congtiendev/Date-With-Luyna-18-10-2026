@@ -15,6 +15,9 @@
 }
 .stage::-webkit-scrollbar { display: none; }
 
+/* Giao diện bị xoay bằng CSS: tắt cuộn cảm ứng gốc (sai trục), Stage tự đọc cử chỉ */
+html.is-landscape-forced .stage { touch-action: none; }
+
 .stage.is-active   { opacity: 1; visibility: visible; }
 .stage.is-dragging { cursor: grabbing; }
 .stage.is-locked   { overflow-x: hidden; cursor: default; }
@@ -23,7 +26,7 @@
     position: relative;
     height: 100%;
     width: max-content;
-    min-width: 100vw;
+    min-width: calc(100 * var(--vw));
     display: flex;
     align-items: flex-start;
     overflow: hidden;        /* xén phần ảnh thừa ra ngoài dải đã canh */
@@ -40,15 +43,15 @@
     display: block;
     width: auto;
     max-width: none;
-    height: calc(100vh / var(--band));
-    height: calc(100dvh / var(--band));
-    margin-top: calc(-1 * var(--shift, 0) * 100vh / var(--band));
-    margin-top: calc(-1 * var(--shift, 0) * 100dvh / var(--band));
+    height: calc(calc(100 * var(--vh)) / var(--band));
+    height: calc(calc(100 * var(--dvh)) / var(--band));
+    margin-top: calc(-1 * var(--shift, 0) * calc(100 * var(--vh)) / var(--band));
+    margin-top: calc(-1 * var(--shift, 0) * calc(100 * var(--dvh)) / var(--band));
     user-select: none;
     -webkit-user-drag: none;
     pointer-events: none;
 }
-.stage__slice--only { min-width: 100vw; }
+.stage__slice--only { min-width: calc(100 * var(--vw)); }
 
 /* Vật đặt lên cảnh (nhà ga…), toạ độ ngang do stage.js đo và gán */
 .stage__prop {

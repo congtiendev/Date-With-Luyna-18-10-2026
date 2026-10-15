@@ -318,10 +318,10 @@ App.Letter = class Letter {
 
         const Z = App.Letter.TINY_SCALE;
         const IN = App.Letter.ZOOM_IN, OUT = App.Letter.ZOOM_OUT;
-        const camR = this.camEl.getBoundingClientRect();
+        const camR = App.Orient.rect(this.camEl);
         // Đo vị trí từng nút lúc camera còn đứng yên
         const centers = tour.map((step) => {
-            const r = step.el.getBoundingClientRect();
+            const r = App.Orient.rect(step.el);
             return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
         });
         const at = (ms, fn) => this.camTimers.push(setTimeout(fn, ms));
@@ -341,8 +341,8 @@ App.Letter = class Letter {
                 step.el.classList.toggle('is-accept', step.accept);
                 step.el.classList.add('is-revealed');
                 this.camEl.style.transition = 'transform ' + IN + 'ms cubic-bezier(.65,0,.25,1)';
-                this.camEl.style.transform = 'translate(' + (innerWidth / 2 - c.x) + 'px,'
-                    + (innerHeight / 2 - c.y) + 'px) scale(' + (1 / Z) + ')';
+                this.camEl.style.transform = 'translate(' + (App.Orient.width() / 2 - c.x) + 'px,'
+                    + (App.Orient.height() / 2 - c.y) + 'px) scale(' + (1 / Z) + ')';
             });
             t += IN + step.hold;
             at(t, () => {
@@ -424,20 +424,20 @@ App.Letter = class Letter {
         this.inkEl.style.fontSize = lw * .066 + 'px';
         this.lines.forEach((o) => { o.ln.style.width = 'auto'; });
 
-        const ir = this.inkEl.getBoundingClientRect();
+        const ir = App.Orient.rect(this.inkEl);
         let scale = 1;
         this.lines.forEach((o) => {
-            const avail = ir.right - o.ln.getBoundingClientRect().left;
+            const avail = ir.right - App.Orient.rect(o.ln).left;
             if (o.sp.offsetWidth > avail && avail > 0) {
                 scale = Math.min(scale, avail / o.sp.offsetWidth);
             }
         });
         if (scale < 1) this.inkEl.style.fontSize = (lw * .066 * scale) + 'px';
 
-        const br = this.letterEl.getBoundingClientRect();
+        const br = App.Orient.rect(this.letterEl);
         this.lines.forEach((o) => {
             o.w = o.sp.offsetWidth;
-            const r = o.ln.getBoundingClientRect();
+            const r = App.Orient.rect(o.ln);
             o.x = r.left - br.left;
             o.y = r.top - br.top + r.height * .74;   // đường kẻ chân chữ
         });
@@ -548,10 +548,10 @@ App.Letter = class Letter {
 
     /* Thư bay ra từ đầu tàu: thu nhỏ về chỗ đó rồi phóng to ra giữa màn hình */
     _flyIn(from) {
-        const lr = this.letterEl.getBoundingClientRect();
-        const sr = from ? from.getBoundingClientRect() : null;
-        const fx = sr ? sr.left + sr.width * .75 : innerWidth / 2;
-        const fy = sr ? sr.top + sr.height * .35 : innerHeight;
+        const lr = App.Orient.rect(this.letterEl);
+        const sr = from ? App.Orient.rect(from) : null;
+        const fx = sr ? sr.left + sr.width * .75 : App.Orient.width() / 2;
+        const fy = sr ? sr.top + sr.height * .35 : App.Orient.height();
         const dx = fx - (lr.left + lr.width / 2);
         const dy = fy - (lr.top + lr.height / 2);
 

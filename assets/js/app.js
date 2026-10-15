@@ -37,7 +37,7 @@
     const runner = new App.Runner(Object.assign({}, cfg.runner, {
         // Mũi đầu tàu nằm ở 1507/1536 bề ngang khung .train
         nose: () => {
-            const r = train.el.getBoundingClientRect();
+            const r = App.Orient.rect(train.el);
             return r.left + r.width * 0.981;
         },
         onDepart: () => control.setState('running'),
@@ -105,7 +105,7 @@
                         text: station.sign.text || formatDate(day.date)
                     }),
                     at: span.at,
-                    height: station.height || '48vh',
+                    height: station.height || 'calc(48 * var(--vh))',
                     baseline: station.baseline,
                     content: station.content,   // viền trong suốt hai bên ảnh ga
                     stop: true,       // Runner lấy các prop có cờ này làm điểm dừng

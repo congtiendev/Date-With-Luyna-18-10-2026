@@ -1,4 +1,4 @@
-/* ---------- Nút xoay ngang + hướng dẫn xoay (chỉ cho điện thoại cầm dọc) ---------- */
+/* ---------- Nút xoay ngang (chỉ cho điện thoại cầm dọc; bấm là cả giao diện xoay bằng CSS) ---------- */
 .rotate-btn {
     position: fixed;
     top: calc(12px + env(safe-area-inset-top, 0px));
@@ -25,90 +25,4 @@
 /* Máy cảm ứng đang cầm dọc */
 @media (pointer: coarse) and (orientation: portrait) {
     .rotate-btn { display: inline-flex; }
-}
-
-/* ---------- Hướng dẫn xoay ---------- */
-.rotate-hint {
-    position: fixed;
-    inset: 0;
-    z-index: 85;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    padding: 24px;
-    text-align: center;
-    background: radial-gradient(ellipse at center, rgba(4, 8, 20, .93), rgba(2, 4, 12, .98));
-    transition: opacity .4s ease, visibility .4s ease;
-}
-.rotate-hint.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-/* Chiếc điện thoại tự xoay từ dọc sang ngang, lặp lại */
-.rotate-hint__phone {
-    position: relative;
-    width: 54px;
-    height: 94px;
-    margin-bottom: 14px;
-    border: 3px solid var(--gold);
-    border-radius: 10px;
-    box-shadow: 0 0 18px rgba(240, 198, 116, .35);
-    animation: rotate-phone 2.8s ease-in-out infinite;
-}
-.rotate-hint__phone::after {        /* nút Home / loa */
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: 6px;
-    width: 14px;
-    height: 3px;
-    margin-left: -7px;
-    border-radius: 2px;
-    background: var(--gold);
-    opacity: .7;
-}
-.rotate-hint.is-hidden .rotate-hint__phone { animation-play-state: paused; }
-@keyframes rotate-phone {
-    0%, 15%   { transform: rotate(0deg); }
-    55%, 85%  { transform: rotate(-90deg); }
-    100%      { transform: rotate(0deg); }
-}
-
-.rotate-hint__title {
-    margin: 0;
-    font-family: var(--font-script);
-    font-weight: 700;
-    font-size: clamp(26px, 7vw, 36px);
-    color: var(--gold);
-}
-.rotate-hint__body,
-.rotate-hint__ios {
-    margin: 0;
-    max-width: 30em;
-    font-family: var(--font-serif);
-    font-size: clamp(16px, 4vw, 19px);
-    line-height: 1.5;
-    color: #eef2ff;
-}
-.rotate-hint__ios {
-    font-size: clamp(14px, 3.5vw, 16px);
-    font-style: italic;
-    color: var(--gold-soft);
-}
-.rotate-hint__ok {
-    margin-top: 10px;
-    min-height: 44px;
-    padding: 10px 32px;
-    border-radius: 999px;
-    border: 1px solid rgba(240, 198, 116, .6);
-    background: linear-gradient(180deg, #f6d98a, #d9a63d);
-    color: #3a2706;
-    font-family: var(--font-serif);
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .rotate-hint__phone { animation: none; transform: rotate(-90deg); }
 }

@@ -5,7 +5,7 @@
     z-index: 60;
     display: grid;
     place-items: center;
-    padding: max(3vh, env(safe-area-inset-top, 0px)) max(4vw, env(safe-area-inset-right, 0px)) max(3vh, env(safe-area-inset-bottom, 0px)) max(4vw, env(safe-area-inset-left, 0px));
+    padding: max(calc(3 * var(--vh)), env(safe-area-inset-top, 0px)) max(calc(4 * var(--vw)), env(safe-area-inset-right, 0px)) max(calc(3 * var(--vh)), env(safe-area-inset-bottom, 0px)) max(calc(4 * var(--vw)), env(safe-area-inset-left, 0px));
     background: radial-gradient(ellipse at center, rgba(4, 8, 20, .72), rgba(2, 4, 12, .94));
     opacity: 0;
     visibility: hidden;
@@ -19,8 +19,8 @@
 
 .letter {
     position: relative;
-    width: min(430px, 84vw, 46vh);   /* chừa chỗ phía dưới cho nút Đồng ý và dòng lời nhắn */
-    width: min(430px, 84vw, 46dvh);
+    width: min(430px, calc(84 * var(--vw)), calc(46 * var(--vh)));   /* chừa chỗ phía dưới cho nút Đồng ý và dòng lời nhắn */
+    width: min(430px, calc(84 * var(--vw)), calc(46 * var(--dvh)));
     aspect-ratio: 1024 / 1536;     /* khung gốc của paper.webp */
     will-change: transform;
 }
@@ -100,15 +100,15 @@
 .letter__tip {
     position: absolute;
     left: 50%;
-    bottom: max(2vh, 12px);
+    bottom: max(calc(2 * var(--vh)), 12px);
     transform: translateX(-50%);
     width: max-content;
-    max-width: 92vw;
+    max-width: calc(92 * var(--vw));
     text-align: center;
     font-family: var(--font-serif);
     font-weight: 600;
     color: var(--gold-soft);
-    font-size: clamp(13px, 2.8vw, 17px);
+    font-size: clamp(13px, calc(2.8 * var(--vw)), 17px);
     text-shadow: 0 2px 6px rgba(0, 0, 0, .7);
     opacity: 0;
     transition: opacity .5s ease;
@@ -167,14 +167,14 @@
 .letter__hint {
     position: absolute;
     left: 50%;
-    top: max(2.2vh, calc(10px + env(safe-area-inset-top, 0px)));
+    top: max(calc(2.2 * var(--vh)), calc(10px + env(safe-area-inset-top, 0px)));
     transform: translateX(-50%);
     width: max-content;
-    max-width: min(92vw, 520px);
+    max-width: min(calc(92 * var(--vw)), 520px);
     margin: 0;
     text-align: center;
     font-family: var(--font-script);
-    font-size: clamp(19px, 4.8vw, 24px);
+    font-size: clamp(19px, calc(4.8 * var(--vw)), 24px);
     font-weight: 600;
     line-height: 1.25;
     color: #f3e2b8;
@@ -190,7 +190,7 @@
 .letter__actions {
     position: absolute;
     left: 50%;
-    bottom: max(1.5vh, 10px);
+    bottom: max(calc(1.5 * var(--vh)), 10px);
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
@@ -213,7 +213,7 @@
         linear-gradient(180deg, #f3e1b3, #e2c27d);
     color: #2b3a6b;                      /* mực xanh của nét bút trên thư */
     font-family: var(--font-script);
-    font-size: clamp(24px, 5.6vw, 29px);
+    font-size: clamp(24px, calc(5.6 * var(--vw)), 29px);
     font-weight: 700;
     line-height: 1.2;
     text-shadow: 0 .02em .03em rgba(43, 58, 107, .32);
@@ -235,7 +235,7 @@
     background: none;
     color: #f3e2b8;
     font-family: var(--font-script);
-    font-size: clamp(19px, 4.6vw, 23px);
+    font-size: clamp(19px, calc(4.6 * var(--vw)), 23px);
     font-weight: 600;
     text-decoration: underline dotted rgba(243, 226, 184, .7);
     text-decoration-thickness: 1.5px;

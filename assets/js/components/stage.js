@@ -225,23 +225,41 @@ App.Stage = class Stage {
         return this;
     }
 
-    /* ---------- Kéo ngang bằng chuột / bút ---------- */
+    /* ---------- Kéo ngang bằng chuột / bút (và cảm ứng khi giao diện bị xoay) ----------
+       Cảm ứng bình thường để trình duyệt tự cuộn cho mượt. Nhưng khi cả giao diện bị xoay
+       90° bằng CSS (App.Orient), cuộn gốc của trình duyệt vẫn đi theo trục MÀN HÌNH nên
+       vuốt sai hướng — lúc đó ta tự đọc cử chỉ: trục ngang của giao diện là trục DỌC của
+       màn hình, và thêm một đoạn quán tính cho vuốt có đà như cuộn gốc. */
     _bindDrag() {
-        let dragging = false, startX = 0, startScroll = 0;
+        let dragging = false, startPos = 0, startScroll = 0;
+        let lastPos = 0, lastT = 0, velocity = 0, inertia = 0;
+
+        const rotated = () => App.Orient && App.Orient.forced;
+        // Trục kéo trên màn hình: bình thường là X; giao diện xoay thì là Y (xuống = tiến)
+        const axis = (e) => (rotated() ? e.clientY : e.clientX);
 
         this.el.addEventListener('pointerdown', (e) => {
-            // Cảm ứng để trình duyệt tự cuộn cho mượt
-            if (!this.canInteract || e.pointerType === 'touch') return;
+            // Cảm ứng bình thường để trình duyệt tự cuộn; chỉ tự xử lý khi giao diện bị xoay
+            if (!this.canInteract || (e.pointerType === 'touch' && !rotated())) return;
+            cancelAnimationFrame(inertia);
             dragging = true;
-            startX = e.clientX;
+            startPos = lastPos = axis(e);
             startScroll = this.el.scrollLeft;
+            lastT = performance.now();
+            velocity = 0;
             this.el.classList.add('is-dragging');
             this.el.setPointerCapture(e.pointerId);
         });
 
         this.el.addEventListener('pointermove', (e) => {
             if (!dragging) return;
-            this.el.scrollLeft = startScroll - (e.clientX - startX);
+            const pos = axis(e), now = performance.now();
+            this.el.scrollLeft = startScroll - (pos - startPos);
+
+            // Vận tốc (px/ms) làm mượt dần để thả tay có đà
+            const dt = now - lastT;
+            if (dt > 0) velocity = velocity * 0.6 + ((pos - lastPos) / dt) * 0.4;
+            lastPos = pos; lastT = now;
         });
 
         const endDrag = (e) => {
@@ -250,6 +268,19 @@ App.Stage = class Stage {
             this.el.classList.remove('is-dragging');
             if (e.pointerId !== undefined && this.el.hasPointerCapture(e.pointerId)) {
                 this.el.releasePointerCapture(e.pointerId);
+            }
+
+            // Thả tay: chỉ cảm ứng mới có đà (chuột thả là dừng)
+            if (e.pointerType === 'touch' && Math.abs(velocity) > 0.05 && performance.now() - lastT < 80) {
+                let v = -velocity;                 // px/ms theo hướng cuộn
+                let last = performance.now();
+                const glide = (now) => {
+                    const dt = now - last; last = now;
+                    this.el.scrollLeft += v * dt;
+                    v *= Math.pow(0.0025, dt / 1000);   // ma sát: còn 0,25% sau 1 giây
+                    if (Math.abs(v) > 0.02) inertia = requestAnimationFrame(glide);
+                };
+                inertia = requestAnimationFrame(glide);
             }
         };
         this.el.addEventListener('pointerup', endDrag);

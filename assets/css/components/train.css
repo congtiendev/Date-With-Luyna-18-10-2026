@@ -7,7 +7,7 @@
 .train {
     /* Cỡ đầu tàu — giá trị mặc định, config.js ghi đè bằng train.height.
        Kẹp thêm theo chiều ngang để trên màn hình dọc tàu không chiếm hết bề ngang. */
-    --train-height: min(32vh, 42vw);
+    --train-height: min(calc(32 * var(--vh)), calc(42 * var(--vw)));
 
     position: fixed;
     /* Đoàn tàu nằm lệch trái để bên phải còn chỗ cho nhà ga hiện trọn vẹn
@@ -17,8 +17,8 @@
     left: min(30%, calc(100% - var(--train-height) * 1.472 - 12px));
     /* Mốc đường ray, mỗi cảnh một khác — train.js đặt qua --rail */
     --rail: 70.03;
-    top: calc(var(--rail) * 1vh);
-    top: calc(var(--rail) * 1dvh);
+    top: calc(var(--rail) * calc(1 * var(--vh)));
+    top: calc(var(--rail) * calc(1 * var(--dvh)));
     height: var(--train-height);
     width: calc(var(--train-height) * 1536 / 1024);
     transform: translateY(-84.22%);   /* kéo lên sao cho đáy bánh xe chạm ray */

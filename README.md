@@ -336,14 +336,24 @@ dừng hụt mất gần 42px.
 
 ## Điện thoại: nút xoay ngang và tối ưu cho iOS
 
-**Nút "Xoay ngang"** (`App.Rotate`) hiện ở góc phải trên, chỉ khi máy cảm ứng đang cầm
-dọc (`@media (pointer: coarse) and (orientation: portrait)`); xoay ngang là nút tự ẩn.
-- **Android:** bấm nút → vào toàn màn hình rồi `screen.orientation.lock('landscape')`,
-  máy tự xoay.
-- **iPhone:** Safari không cho khoá hướng và không có toàn màn hình cho trang web, nên
-  nút hiện hướng dẫn: cầm ngang, và nếu máy không xoay thì tắt "Khoá hướng dọc" trong
-  Trung tâm điều khiển. Hướng dẫn tự đóng ngay khi máy xoay ngang.
-- Chữ chỉnh ở `config.rotate`.
+**Nút "Xoay ngang"** (`App.Rotate`) hiện ở góc phải trên, chỉ khi máy cảm ứng đang cầm dọc
+(`@media (pointer: coarse) and (orientation: portrait)`). Bấm là **cả giao diện xoay 90° bằng
+CSS** — không phụ thuộc hệ điều hành có cho xoay màn hình hay không (iPhone đang khoá hướng
+dọc, Android tắt tự xoay… đều xoay được). Bấm lần nữa ("Xoay dọc") để quay về. Máy xoay ngang
+thật thì giao diện tự về bình thường và nút tự ẩn. Chữ chỉnh ở `config.rotate`.
+
+Cách làm (`App.Orient` trong `device.js`, phần CSS cuối `base.css`):
+- `html.is-landscape-forced` làm `#app` rộng bằng chiều **cao** thật, cao bằng chiều **rộng**
+  thật, rồi `rotate(90deg)` quanh góc trên-trái và đẩy sang phải một bề rộng màn. Mọi phần tử
+  `position: fixed` bên trong bám theo khung này.
+- **CSS không dùng thẳng `vw` / `vh` / `dvh`** mà dùng `calc(N * var(--vw))`… Lúc xoay hai biến
+  `--vw` / `--vh` đổi chỗ cho nhau, nên mọi cỡ theo màn hình vẫn đúng. Viết cỡ mới thì cũng
+  dùng biến (kể cả chuỗi trong `config.js` / `day.js`).
+- JS **không** đo thẳng bằng `getBoundingClientRect` / `innerWidth` mà đi qua
+  `App.Orient.rect(el)` / `width()` / `height()` (số theo khung giao diện, không theo màn hình).
+- Cuộn cảm ứng gốc của trình duyệt đi theo trục màn hình nên vuốt sai hướng khi xoay; `Stage`
+  khi đó tự đọc cử chỉ (trục ngang giao diện = trục dọc màn hình) và thêm quán tính.
+- Chưa xử lý `env(safe-area-inset-*)` riêng cho chế độ xoay (tai thỏ chỉ chừa lề ở phía cũ).
 
 **Riêng cho iOS Safari:**
 
@@ -438,6 +448,17 @@ Thêm vào địa chỉ trang, khỏi phải vuốt, lên tàu, chờ tàu vào 
 
 Dùng ngày đầu tiên có khai `letter`. Tải lại trang là thử lại từ đầu (vì không lưu gì
 vào trình duyệt). Không có tham số này thì trang chạy như bình thường.
+
+## Tiêu đề, biểu tượng tab và ảnh chia sẻ link
+
+- Tiêu đề tab: **KongTien × Luyna · Chuyến tàu kỉ niệm**, mô tả ngắn không lộ chuyện có lời mời.
+- `favicon.ico` (16/32/48), `favicon-16.png`, `favicon-32.png`, `apple-touch-icon.png` (180),
+  `icon-192.png`: đầu tàu hơi nước trên nền xanh đêm viền vàng.
+- `og-image.jpg` (1200 × 630): ảnh hiện khi chia sẻ link lên Messenger / Zalo / Facebook — nền
+  bầu trời sao, đầu tàu và tên hai người. Các thẻ `og:*`, `twitter:*` và `canonical` trong
+  `index.html` trỏ tới `https://congtiendev.github.io/Date-With-Luyna-18-10-2026/`.
+- Facebook, Zalo… **cache** ảnh chia sẻ rất lâu: đổi ảnh xong mà vẫn thấy ảnh cũ thì dán link vào
+  công cụ gỡ lỗi của họ để làm mới, hoặc đổi tên file ảnh.
 
 ## Ảnh: vì sao toàn `.webp`
 

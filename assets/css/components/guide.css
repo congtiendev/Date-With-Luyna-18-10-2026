@@ -14,11 +14,11 @@
     box-shadow: 0 6px 30px rgba(0, 0, 0, .45);
     color: var(--gold-soft);
     font-family: var(--font-serif);
-    font-size: clamp(14px, 2.6vw, 19px);
+    font-size: clamp(14px, calc(2.6 * var(--vw)), 19px);
     letter-spacing: .05em;
     /* Màn hẹp (điện thoại dọc): xuống dòng thay vì tràn ra hai mép */
     width: max-content;
-    max-width: calc(100vw - 24px);
+    max-width: calc(calc(100 * var(--vw)) - 24px);
     text-align: center;
     z-index: 25;
     opacity: 0;
@@ -61,4 +61,11 @@
         bottom: auto;
         top: calc(12px + env(safe-area-inset-top, 0px));
     }
+}
+
+/* Giao diện bị xoay ngang bằng CSS cũng là màn thấp: cùng cách đặt */
+html.is-landscape-forced .guide,
+html.is-landscape-forced .guide.is-raised {
+    bottom: auto;
+    top: 12px;
 }

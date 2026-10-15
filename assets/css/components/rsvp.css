@@ -16,8 +16,8 @@
    hộp rộng tới 118% bề ngang màn để phần vẽ gần chạm hai mép — chữ cũng lớn theo.
    Bị chặn bởi chiều cao màn, chừa chỗ cho nút "đi tìm nút" (1.5 = 1536 / 1024). */
 .rsvp .modal {
-    width: min(118vw, 920px, calc((100vh - 90px) * 1.5));
-    width: min(118vw, 920px, calc((100dvh - 90px) * 1.5));
+    width: min(calc(118 * var(--vw)), 920px, calc((calc(100 * var(--vh)) - 90px) * 1.5));
+    width: min(calc(118 * var(--vw)), 920px, calc((calc(100 * var(--dvh)) - 90px) * 1.5));
     max-height: none;
     flex: none;
 }
@@ -25,7 +25,7 @@
 
 /* Chữ trên tấm biển vàng to và sáng hơn mặc định để dễ đọc trên màn nhỏ */
 .rsvp .modal__btn--single {
-    font-size: clamp(14px, 3.6vw, 22px);
+    font-size: clamp(14px, calc(3.6 * var(--vw)), 22px);
     font-size: clamp(14px, 3.5cqw, 22px);
     font-weight: 700;
     letter-spacing: .08em;
@@ -43,7 +43,7 @@
     background: rgba(8, 14, 32, .88);
     color: #ffe9b0;
     font-family: var(--font-serif);
-    font-size: clamp(17px, 4.2vw, 20px);
+    font-size: clamp(17px, calc(4.2 * var(--vw)), 20px);
     font-weight: 700;
     letter-spacing: .02em;
     cursor: pointer;

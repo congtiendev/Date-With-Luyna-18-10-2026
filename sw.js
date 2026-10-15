@@ -9,7 +9,7 @@
  * ĐỔI `VERSION` mỗi khi thay ảnh giữ nguyên tên file, không thì người đã vào
  * trang vẫn thấy ảnh cũ. Đổi VERSION thì cache cũ bị xoá khi worker mới lên.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = 'kongtien-luyna-' + VERSION;
 
 // Tải sẵn lúc cài, để chuyến tàu chạy được ngay cả khi mạng chập chờn

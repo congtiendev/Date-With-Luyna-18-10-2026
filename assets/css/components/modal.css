@@ -18,8 +18,8 @@
 
 .modal {
     position: relative;
-    width: min(92vw, 780px);
-    max-height: 92vh;
+    width: min(calc(92 * var(--vw)), 780px);
+    max-height: calc(92 * var(--vh));
     aspect-ratio: 1536 / 1024;
     container-type: size;
 }
@@ -61,7 +61,7 @@
 .modal__title {
     font-family: var(--font-script);
     font-weight: 700;
-    font-size: clamp(20px, 5.4vw, 52px);              /* dự phòng cho Safari < 16 (chưa có cqw) */
+    font-size: clamp(20px, calc(5.4 * var(--vw)), 52px);              /* dự phòng cho Safari < 16 (chưa có cqw) */
     font-size: clamp(20px, 6.4cqw, 52px);
     line-height: 1.15;
     color: var(--gold);
@@ -80,7 +80,7 @@
 .modal__body {
     font-family: var(--font-serif);
     font-weight: 600;
-    font-size: clamp(13px, 2.6vw, 26px);
+    font-size: clamp(13px, calc(2.6 * var(--vw)), 26px);
     font-size: clamp(13px, 3.1cqw, 26px);
     line-height: 1.6;
     color: #eef2ff;
@@ -126,7 +126,7 @@
     top: 85%;
     width: 22%;
     height: 6.2%;
-    font-size: clamp(11px, 1.95vw, 20px);
+    font-size: clamp(11px, calc(1.95 * var(--vw)), 20px);
     font-size: clamp(11px, 2.3cqw, 20px);
 }
 
@@ -136,7 +136,7 @@
     top: 84%;
     width: 21%;
     height: 6.5%;
-    font-size: clamp(10px, 1.75vw, 18px);
+    font-size: clamp(10px, calc(1.75 * var(--vw)), 18px);
     font-size: clamp(10px, 2.05cqw, 18px);
 }
 .modal__btn--left  { left: 37.3%; color: var(--gold-soft); opacity: .85; }

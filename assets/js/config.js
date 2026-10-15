@@ -84,7 +84,7 @@ App.config = {
 
         // Cỡ đầu tàu: chiều cao khung ảnh. Số vh càng lớn tàu càng to;
         // vế vw để trên màn hình dọc tàu không chiếm hết bề ngang.
-        height: 'min(36vh, 47vw)',
+        height: 'min(calc(36 * var(--vh)), calc(47 * var(--vw)))',
         distancePerFrame: 34   // vuốt bao nhiêu px thì bánh xe sang khung kế tiếp
     },
 
@@ -131,13 +131,10 @@ App.config = {
         seek: 'Đi tìm nút từ chối 🔍'
     },
 
-    // Nút xoay ngang cho điện thoại cầm dọc
+    // Nút xoay ngang cho điện thoại cầm dọc: bấm là cả giao diện xoay 90° bằng CSS
     rotate: {
         label: 'Xoay ngang',
-        title: 'Xoay ngang điện thoại nhé',
-        body: 'Hành trình là một dải tranh dài, cầm ngang xem sẽ trọn vẹn hơn nhiều.',
-        ios: 'iPhone không tự xoay được? Mở Trung tâm điều khiển, tắt “Khoá hướng dọc”, rồi xoay máy ngang.',
-        confirm: 'Đã hiểu'
+        labelBack: 'Xoay dọc'
     },
 
     boardModal: {

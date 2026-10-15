@@ -21,7 +21,7 @@ App.Days.register({
 
     "station": {
         "image": "photos/station.webp",
-        "height": "min(48vh, 55vw)",
+        "height": "min(calc(48 * var(--vh)), calc(55 * var(--vw)))",
         "baseline": 0.7764,
         "content": { "left": 0.0716, "right": 0.9290 },
         "sign": { "x": 0.4883, "y": 0.4214, "width": 0.1432, "height": 0.0459 },
