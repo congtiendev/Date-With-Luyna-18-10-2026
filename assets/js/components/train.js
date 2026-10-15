@@ -28,6 +28,7 @@ App.Train = class Train {
         this.options = options;
         this.frame = 0;
         this.stopTimer = null;
+        this.onMotion = null;    // gọi (true|false) khi tàu bắt đầu / thôi lăn bánh
         this.wheelGroups = [];   // mỗi nhóm là 5 khung bánh của một cụm
 
         this.el = document.createElement('div');
@@ -41,6 +42,7 @@ App.Train = class Train {
 
         const body = document.createElement('img');
         body.className = 'train__layer train__body';
+        body.decoding = 'async';
         body.src = options.body;
         body.alt = 'Đầu tàu';
         this.el.appendChild(body);
@@ -58,6 +60,7 @@ App.Train = class Train {
             const img = document.createElement('img');
             img.className = 'train__layer train__wheel--frame ' + extraClass
                           + ' train__wheel--' + (i + 1);
+            img.decoding = 'async';
             img.src = src;
             img.alt = '';
             if (style) Object.assign(img.style, style);
@@ -83,18 +86,11 @@ App.Train = class Train {
 
             const carriage = document.createElement('img');
             carriage.className = 'train__layer train__carriage';
+            carriage.decoding = 'async';
             carriage.src = cfg.image;
             carriage.alt = '';
             Object.assign(carriage.style, box);
             this.el.appendChild(carriage);
-
-            // Bản sao chỉ lộ phần gầm, làm sáng để gầm toa không chìm vào nền cầu
-            const lit = document.createElement('img');
-            lit.className = 'train__layer train__carriage train__carriage-lit';
-            lit.src = cfg.image;
-            lit.alt = '';
-            Object.assign(lit.style, box);
-            this.el.appendChild(lit);
 
             // Bánh kiểu đầu tàu cho từng giá chuyển hướng
             G.bogies.forEach((bogie) => {
@@ -151,6 +147,7 @@ App.Train = class Train {
         }
 
         // Đang vuốt thì thân tàu rung nhẹ và khói phun dày, ngừng một nhịp là thôi
+        if (!this.el.classList.contains('is-running') && this.onMotion) this.onMotion(true);
         this.el.classList.add('is-running');
         if (this.smoke) this.smoke.setRunning(true);
 
@@ -158,6 +155,7 @@ App.Train = class Train {
         this.stopTimer = setTimeout(() => {
             this.el.classList.remove('is-running');
             if (this.smoke) this.smoke.setRunning(false);
+            if (this.onMotion) this.onMotion(false);
         }, 180);
         return this;
     }

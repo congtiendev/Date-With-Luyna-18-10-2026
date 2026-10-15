@@ -35,16 +35,17 @@ SOURCE_EXT = ('.png', '.jpg', '.jpeg')
 RULES = [
     # Phông cảnh chạy full màn hình, ảnh gốc đã phải phóng to lên -> giữ nguyên cỡ.
     ('assets/images/scenes/',       80, None),
-    # Khung popup rộng tối đa 780px CSS -> 1536px là vừa đủ cho màn Retina.
-    ('assets/images/frames/',       82, None),
-    # Đầu tàu, toa, bánh xe: cao tối đa 36vh, màn 2K Retina cần ~1040px.
-    ('assets/images/train-wheels/', 80, None),
-    ('assets/images/locomotive',    80, None),
-    ('assets/images/train-carriage', 80, None),
-    # Khói và bong bóng cao tối đa bằng khung tàu -> 1152px là dư.
-    ('assets/images/smoke/',        80, 1152),
+    # Khung popup rộng tối đa 780px CSS -> 1280px là vừa đủ cho màn Retina.
+    ('assets/images/frames/',       82, 1280),
+    # Bánh xe chỉ rộng 64% đầu tàu (và 28% trên toa) -> 768px là dư.
+    ('assets/images/train-wheels/', 80, 768),
+    # Đầu tàu và toa: rộng tối đa ~600px CSS trên desktop, ~830px thiết bị trên điện thoại.
+    ('assets/images/locomotive',    80, 1280),
+    ('assets/images/train-carriage', 80, 1280),
+    # Khói cao tối đa bằng khung tàu -> 864px là dư.
+    ('assets/images/smoke/',        78, 864),
     # Nhà ga cao tối đa 48vh.
-    ('assets/days/',                82, None),
+    ('assets/days/',                82, 1152),
 ]
 DEFAULT_RULE = (82, None)
 

@@ -48,6 +48,7 @@ App.Stage = class Stage {
         this.slices = list.map((item, i) => {
             const img = document.createElement('img');
             img.className = 'stage__slice' + (list.length === 1 ? ' stage__slice--only' : '');
+            img.decoding = 'async';
             img.src = item.src;
             img.alt = item.alt || (i === 0 ? (options.alt || '') : '');
 
@@ -110,6 +111,7 @@ App.Stage = class Stage {
         holder.style.transform = 'translate(-50%, -' + baseline + '%)';
 
         const img = document.createElement('img');
+        img.decoding = 'async';
         img.src = prop.image;
         img.alt = prop.alt || '';
         img.style.height = prop.height;

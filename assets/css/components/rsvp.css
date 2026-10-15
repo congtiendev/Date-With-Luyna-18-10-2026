@@ -1,0 +1,51 @@
+/* ---------- Popup xác nhận buổi hẹn ----------
+   Dùng lại .overlay / .modal của modal.css, chỉ thêm phần riêng. */
+.overlay.rsvp {
+    z-index: 70;          /* nằm trên lá thư (60) */
+    background: radial-gradient(ellipse at center, rgba(4, 8, 20, .9), rgba(2, 4, 12, .97));
+}
+
+.rsvp__col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Cỡ khung: ảnh khung có ~10% viền trong suốt mỗi bên (phần vẽ chỉ rộng ~79%), nên cho
+   hộp rộng tới 118% bề ngang màn để phần vẽ gần chạm hai mép — chữ cũng lớn theo.
+   Bị chặn bởi chiều cao màn, chừa chỗ cho nút "đi tìm nút" (1.5 = 1536 / 1024). */
+.rsvp .modal {
+    width: min(118vw, 920px, calc((100vh - 90px) * 1.5));
+    width: min(118vw, 920px, calc((100dvh - 90px) * 1.5));
+    max-height: none;
+    flex: none;
+}
+.rsvp__col { flex: none; }
+
+/* Chữ trên tấm biển vàng to và sáng hơn mặc định để dễ đọc trên màn nhỏ */
+.rsvp .modal__btn--single {
+    font-size: clamp(14px, 3.6vw, 22px);
+    font-size: clamp(14px, 3.5cqw, 22px);
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: #ffe9b0;
+    text-shadow: 0 0 10px rgba(240, 198, 116, .6), 0 1px 3px rgba(0, 0, 0, .8);
+}
+
+/* "Đi tìm nút từ chối": nút viền rõ, chữ thẳng và đậm, không nghiêng, không gạch chân */
+.rsvp__seek {
+    margin-top: 6px;
+    min-height: 44px;
+    padding: 10px 22px;
+    border: 1px solid rgba(240, 198, 116, .65);
+    border-radius: 999px;
+    background: rgba(8, 14, 32, .88);
+    color: #ffe9b0;
+    font-family: var(--font-serif);
+    font-size: clamp(17px, 4.2vw, 20px);
+    font-weight: 700;
+    letter-spacing: .02em;
+    cursor: pointer;
+}
+.rsvp__seek:active { transform: scale(.97); }

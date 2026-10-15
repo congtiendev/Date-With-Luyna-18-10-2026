@@ -53,6 +53,7 @@ App.Smoke = class Smoke {
         this.frames = o.images.map((src, i) => {
             const img = document.createElement('img');
             img.className = 'smoke__frame';
+            img.decoding = 'async';
             img.src = src;
             img.alt = '';
 

@@ -5,11 +5,11 @@
     z-index: 60;
     display: grid;
     place-items: center;
-    padding: 3vh 4vw;
-    background: radial-gradient(ellipse at center, rgba(4, 8, 20, .6), rgba(2, 4, 12, .88));
-    backdrop-filter: blur(3px);
+    padding: max(3vh, env(safe-area-inset-top, 0px)) max(4vw, env(safe-area-inset-right, 0px)) max(3vh, env(safe-area-inset-bottom, 0px)) max(4vw, env(safe-area-inset-left, 0px));
+    background: radial-gradient(ellipse at center, rgba(4, 8, 20, .72), rgba(2, 4, 12, .94));
     opacity: 0;
     visibility: hidden;
+    overflow: hidden;           /* zoom tới nút từ chối thì khối phóng ra ngoài màn */
     transition: opacity .6s ease, visibility .6s ease;
 }
 .letter-scene.is-open {
@@ -19,10 +19,24 @@
 
 .letter {
     position: relative;
-    width: min(430px, 84vw, 56vh);
+    width: min(430px, 84vw, 46vh);   /* chừa chỗ phía dưới cho nút Đồng ý và dòng lời nhắn */
+    width: min(430px, 84vw, 46dvh);
     aspect-ratio: 1024 / 1536;     /* khung gốc của paper.webp */
-    filter: drop-shadow(0 18px 34px rgba(0, 0, 0, .5));
     will-change: transform;
+}
+
+/* Bóng đổ là ảnh riêng, nhỏ và tĩnh, nới ra ngoài tờ giấy — dùng filter:
+   drop-shadow thì mỗi nét bút viết ra lại bắt GPU làm mờ cả tờ thư một lần.
+   Canvas 356 × 484 quanh tờ giấy 256 × 384 (đệm 50 mỗi phía). */
+.letter__shadow {
+    position: absolute;
+    left: -19.53125%;
+    top: -13.02083%;
+    width: 139.0625%;
+    height: 126.04167%;
+    pointer-events: none;
+    user-select: none;
+    z-index: -1;      /* sau tờ giấy; .letter đã là stacking context nhờ will-change */
 }
 .letter__sheet {
     width: 100%;
@@ -61,6 +75,9 @@
     text-shadow: 0 .012em .02em rgba(43, 58, 107, .32);
 }
 .letter__line.is-greet > span { font-size: 1.12em; }
+/* Nơi và ngày viết thư: góc phải trên, chữ nhỏ hơn một chút */
+.letter__line.is-date { margin-left: 34%; }
+.letter__line.is-date > span { font-size: .9em; }
 .letter__line.is-sign { margin-left: 32%; }
 .letter__line.is-sign > span { font-size: 1.08em; }
 .letter__line:nth-child(odd)  > span { transform: rotate(-.35deg); }
@@ -71,11 +88,11 @@
     position: absolute;
     left: 0;
     top: 0;
-    transform-origin: 6.35% 97.6%;
+    /* Đầu ngòi trong pen.webp (đã nướng bóng đổ nên canvas nới ra 1264 × 1796) */
+    transform-origin: 16.22% 89.04%;
     opacity: 0;
     pointer-events: none;
     transition: opacity .45s ease;
-    filter: drop-shadow(-6px 10px 12px rgba(0, 0, 0, .38));
     will-change: transform;
 }
 .letter__pen.is-on { opacity: 1; }
@@ -85,6 +102,9 @@
     left: 50%;
     bottom: max(2vh, 12px);
     transform: translateX(-50%);
+    width: max-content;
+    max-width: 92vw;
+    text-align: center;
     font-family: var(--font-serif);
     font-weight: 600;
     color: var(--gold-soft);
@@ -96,6 +116,194 @@
 }
 .letter__tip.is-shown { opacity: 1; }
 
+/* ---------- Lời mời: nút Đồng ý rõ ràng, nút Từ chối ngụy trang ---------- */
+.letter__cam { position: relative; }
+
+/* Hai nút giấu: vẽ cỡ thường rồi thu nhỏ 32 lần (App.Letter.TINY_SCALE) — chỉ còn một hạt
+   ~3 × 1,3 px. Tô đúng màu nền tối và đặt trong KHE RÁCH ở mép giấy (App.Letter.NOTCHES),
+   nên chìm hẳn vào khoảng trống; chữ trong suốt, không viền không bóng. Chỗ đặt do JS
+   gán (ngẫu nhiên, có lưu). Camera zoom tới thì mới lộ nguyên hình (.is-revealed). */
+.letter__tiny {
+    position: absolute;
+    display: none;
+    padding: 10px 24px;
+    border: 0;
+    border-radius: 999px;
+    background: #070b18;
+    color: transparent;
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: default;
+    transform: translate(-50%, -50%) scale(.03125);
+    transition: background .6s ease, color .6s ease, box-shadow .6s ease;
+}
+/* Vùng bấm rộng hơn hạt thấy được (~16 px) để mò trúng còn có thể */
+.letter__tiny::after {
+    content: '';
+    position: absolute;
+    inset: -250px;
+}
+.letter.is-hunting .letter__tiny { display: block; }
+.letter__tiny.is-revealed {
+    background: #2b3a6b;
+    color: var(--gold);
+    box-shadow: 0 0 0 1px rgba(240, 198, 116, .7), 0 0 18px rgba(240, 198, 116, .6);
+    cursor: pointer;
+}
+/* Lộ ra là một nút Đồng ý: mảnh giấy vàng, chữ viết tay mực xanh như nút thật phía dưới */
+.letter__tiny.is-revealed.is-accept {
+    padding: 6px 44px 10px;
+    background: linear-gradient(180deg, #f3e1b3, #e2c27d);
+    color: #2b3a6b;
+    font-family: var(--font-script);
+    font-size: 26px;
+    box-shadow: 0 0 0 1px rgba(150, 105, 45, .55), 0 0 22px rgba(243, 225, 179, .5);
+}
+
+/* Gợi ý trên đỉnh màn hình: nút từ chối đang nằm đâu đó trong lá thư. Chữ viết tay màu
+   giấy cũ như dòng "không tìm thấy" bên dưới. */
+.letter__hint {
+    position: absolute;
+    left: 50%;
+    top: max(2.2vh, calc(10px + env(safe-area-inset-top, 0px)));
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: min(92vw, 520px);
+    margin: 0;
+    text-align: center;
+    font-family: var(--font-script);
+    font-size: clamp(19px, 4.8vw, 24px);
+    font-weight: 600;
+    line-height: 1.25;
+    color: #f3e2b8;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, .9);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .8s ease, visibility .8s ease;
+}
+.letter__hint.is-shown { opacity: 1; visibility: visible; }
+
+/* Nút Đồng ý hiện rõ dưới tờ thư; dòng "không tìm thấy" nằm dưới nó và hiện muộn */
+.letter__actions {
+    position: absolute;
+    left: 50%;
+    bottom: max(1.5vh, 10px);
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s ease, visibility .5s ease;
+}
+.letter__actions.is-shown { opacity: 1; visibility: visible; }
+
+.letter__accept {
+    min-height: 50px;
+    padding: 6px 44px 10px;
+    border: 0;
+    /* Mép hơi lệch như mảnh giấy xé tay, cùng họ với tờ thư phía trên */
+    border-radius: 14px 19px 13px 17px / 17px 13px 19px 14px;
+    background:
+        radial-gradient(ellipse at 28% 22%, #fff8e0 0%, rgba(255, 248, 224, 0) 55%),
+        linear-gradient(180deg, #f3e1b3, #e2c27d);
+    color: #2b3a6b;                      /* mực xanh của nét bút trên thư */
+    font-family: var(--font-script);
+    font-size: clamp(24px, 5.6vw, 29px);
+    font-weight: 700;
+    line-height: 1.2;
+    text-shadow: 0 .02em .03em rgba(43, 58, 107, .32);
+    /* Đường khâu nét đứt bên trong + bóng đổ như mảnh giấy đặt lên nền tối */
+    outline: 1.5px dashed rgba(120, 80, 30, .5);
+    outline-offset: -6px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .5), 0 0 0 1px rgba(150, 105, 45, .55);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.letter__accept:hover { box-shadow: 0 10px 24px rgba(0, 0, 0, .55), 0 0 0 1px rgba(150, 105, 45, .7), 0 0 18px rgba(243, 225, 179, .35); }
+.letter__accept:active { transform: translateY(2px) scale(.98); }
+
+/* Dòng "không tìm thấy nút từ chối" — chữ viết tay như trên thư, màu giấy cũ */
+.letter__giveup {
+    padding: 6px 14px;
+    border: 0;
+    background: none;
+    color: #f3e2b8;
+    font-family: var(--font-script);
+    font-size: clamp(19px, 4.6vw, 23px);
+    font-weight: 600;
+    text-decoration: underline dotted rgba(243, 226, 184, .7);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 5px;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, .85);
+    white-space: nowrap;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.2s ease, visibility 1.2s ease;
+}
+.letter__giveup.is-shown { opacity: .9; visibility: visible; }
+.letter__giveup.is-shown:hover { opacity: 1; }
+
+/* Con dấu tròn "Đã đồng ý" đóng ở khoảng trống dưới chữ ký, như mực đỏ thấm vào
+   giấy. Đường kính ~ 27% bề rộng tờ thư; đặt thấp hơn dòng ký tên để không che tên. */
+.letter__stamp {
+    --d: calc(var(--stamp-size, 20px) * 4.4);
+    position: absolute;
+    left: 56%;
+    top: 78%;
+    width: var(--d);
+    height: var(--d);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: calc(var(--stamp-size, 20px) * .14) double #b1262b;
+    border-radius: 50%;
+    color: #b1262b;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: calc(var(--stamp-size, 20px) * .8);
+    line-height: 1.15;
+    letter-spacing: .06em;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0;
+    transform: rotate(-14deg);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+}
+/* Vòng mảnh phía trong */
+.letter__stamp::before {
+    content: '';
+    position: absolute;
+    inset: 9%;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    opacity: .7;
+}
+.letter__stamp.is-set { opacity: .82; }
+.letter__stamp.is-stamping { animation: letter-stamp .55s cubic-bezier(.2, .9, .3, 1) both; }
+@keyframes letter-stamp {
+    0%   { opacity: 0;   transform: rotate(-32deg) scale(2.8); }
+    60%  { opacity: .95; transform: rotate(-14deg) scale(.94); }
+    100% { opacity: .82; transform: rotate(-14deg) scale(1); }
+}
+
+.letter.is-thump { animation: letter-thump .4s ease .35s; }
+@keyframes letter-thump {
+    0%, 100% { scale: 1; }
+    40% { scale: .985; }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .letter-scene, .letter, .letter__pen { transition: none; }
+    .letter__stamp.is-stamping, .letter.is-thump { animation: none; }
+    .letter__stamp.is-stamping { opacity: .82; }
 }

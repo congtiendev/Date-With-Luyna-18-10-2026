@@ -2,7 +2,7 @@
 .control {
     position: fixed;
     left: 50%;
-    bottom: 34px;
+    bottom: calc(34px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
     display: flex;
     align-items: center;
@@ -10,9 +10,8 @@
     padding: 13px 32px 13px 26px;
     border-radius: 999px;
     border: 1px solid rgba(240, 198, 116, .45);
-    background: rgba(8, 14, 32, .72);
+    background: rgba(8, 14, 32, .88);
     box-shadow: 0 8px 34px rgba(0, 0, 0, .5), inset 0 0 22px rgba(240, 198, 116, .1);
-    backdrop-filter: blur(8px);
 
     color: var(--gold);
     font-family: var(--font-serif);

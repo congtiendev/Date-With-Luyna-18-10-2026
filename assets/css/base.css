@@ -20,4 +20,21 @@ html, body {
     background: var(--night);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;   /* khỏi nháy xám khi chạm trên iOS */
+    touch-action: manipulation;                 /* chặn zoom khi chạm đúp */
 }
+
+/* iOS Safari: ghim cứng body để kéo xuống không "đàn hồi" lộ nền trắng,
+   và thanh địa chỉ co giãn không làm trang nhảy */
+body {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;                /* khỏi menu "Lưu ảnh" khi giữ lâu */
+}
+img { -webkit-touch-callout: none; }

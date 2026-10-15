@@ -1,4 +1,5 @@
 # Rác của hệ điều hành và trình soạn thảo
+.sentry-native/
 .DS_Store
 Thumbs.db
 *.swp

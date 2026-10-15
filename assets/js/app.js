@@ -5,6 +5,8 @@
  *   3. "Sẵn sàng" -> lớp sáng phủ lên rồi mở ra cảnh hành trình.
  */
 (function () {
+    App.Device.init();
+
     const cfg = App.config;
     const t = cfg.timing;
     const root = document.getElementById('app');
@@ -20,6 +22,12 @@
     const guide    = new App.Guide().mount(root);
     const veil     = new App.Veil().mount(root);
     const train    = new App.Train(cfg.train).mount(root);
+
+    // Tiếng tàu bám theo chuyển động: tàu tự chạy hay người xem tự vuốt đều có
+    const sound = new App.Sound(cfg.sound);
+    train.onMotion = (moving) => (moving ? sound.start() : sound.stop());
+
+    new App.Rotate(cfg.rotate).mount(root);
 
     const control = new App.Control({
         labels: cfg.control,
@@ -50,7 +58,18 @@
         ]
     }).mount(root);
 
-    const letter = new App.Letter(cfg.letter).mount(root);
+    // Thư viết xong thì popup bật lên. "Đồng ý" thì đóng dấu luôn; "đi tìm nút từ chối"
+    // thì popup đóng lại và cuộc săn nút Từ chối trên tờ thư bắt đầu
+    const rsvp = new App.Rsvp(Object.assign({}, cfg.rsvp, {
+        frame: cfg.frames.oneButton,
+        onAccept: () => letter.answer('accept'),
+        onSeek: () => letter.startHunt()
+    })).mount(root);
+    const letter = new App.Letter(Object.assign({}, cfg.letter, {
+        onRead: () => rsvp.open(),
+        // Đóng thư là tải lại trang: mọi thứ về trạng thái ban đầu. Chờ thư mờ hẳn rồi mới tải.
+        onClose: () => setTimeout(() => location.reload(), App.Letter.CLOSE_RELOAD_MS)
+    })).mount(root);
 
     let current = stages.welcome;
     let boardAsked = false;
@@ -58,7 +77,7 @@
     current.activate();
     beginExploring();
 
-    /** 2026-06-28 -> 28-6-2026, đúng cách người Việt đọc ngày */
+    /** 2026-10-18 -> 18-10-2026, đúng cách người Việt đọc ngày */
     function formatDate(iso) {
         const parts = String(iso || '').split('-');
         if (parts.length !== 3) return iso || '';
@@ -97,6 +116,33 @@
     });
     App.Days.load(cfg.days);
 
+    /* ---------- Giải mã sẵn ảnh lúc rảnh để cảnh sau khỏi khựng ---------- */
+    // Chờ trang tải xong để ảnh nền của màn đầu được ưu tiên băng thông
+    const warmUp = () => App.Preload.warm(root);
+    window.addEventListener('load', () => setTimeout(warmUp, 400));
+    document.addEventListener('days:ready', () => {
+        if (document.readyState === 'complete') warmUp();
+    });
+
+    /* ---------- Chế độ thử: bỏ qua đoạn tàu chạy ----------
+       Thêm vào địa chỉ trang:
+         ?test=letter   thư mở ra và bút viết ngay, rồi popup xác nhận bật lên
+         ?test=rsvp     thư hiện sẵn đủ chữ, popup xác nhận bật lên gần như tức thì
+       Dùng ngày đầu tiên có khai `letter`. Tải lại trang là thử lại từ đầu. */
+    const testMode = new URLSearchParams(location.search).get('test');
+    if (testMode === 'letter' || testMode === 'rsvp') {
+        document.addEventListener('days:ready', (e) => {
+            const day = e.detail.find((d) => d.letter.length);
+            if (!day) return;
+
+            guide.clearIdle().hide();
+            progress.hide();
+            current.lock(true);
+            if (testMode === 'rsvp') letter.seen[day.id] = true;   // coi như đã viết rồi
+            letter.open(day.letter, { key: day.id });
+        });
+    }
+
     /* ---------- Theo dõi cuộn của cảnh đang xem ---------- */
     Object.values(stages).forEach((stage) => {
         stage.onScroll = (s) => {
@@ -118,7 +164,7 @@
 
     function armIdleHint() {
         guide.armIdle(
-            () => current.canInteract && !boardAsked && !current.atEnd,
+            () => current.canInteract && !boardAsked && !current.atEnd && !letter.isOpen,
             cfg.guide.keepGoing
         );
     }
@@ -214,7 +260,7 @@
             if (e.key === 'Enter')  startJourney();
             return;
         }
-        if (letter.isOpen || !current.canInteract) return;
+        if (letter.isOpen || rsvp.isOpen || !current.canInteract) return;
         if (e.key === 'ArrowLeft')  current.nudge(-t.keyStep);
         if (e.key === 'ArrowRight') current.nudge(t.keyStep);
         if (e.key === 'End')        current.scrollTo(current.maxScroll);
@@ -222,7 +268,7 @@
 
     // Để tiện gỡ lỗi và mở rộng thêm cảnh sau này
     App.flow = {
-        stages, train, guide, progress, veil, control, runner, days: App.Days,
+        stages, train, sound, guide, progress, veil, control, runner, days: App.Days,
         goToStage, startJourney, askBoarding, arriveStation, leaveStation,
         current: () => current
     };

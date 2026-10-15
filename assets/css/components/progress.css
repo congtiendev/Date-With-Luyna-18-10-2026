@@ -2,7 +2,7 @@
 .progress {
     position: fixed;
     left: 0;
-    top: 0;
+    top: env(safe-area-inset-top, 0px);
     height: 2px;
     width: 100%;
     background: rgba(240, 198, 116, .12);

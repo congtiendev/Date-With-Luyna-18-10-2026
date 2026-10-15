@@ -27,6 +27,7 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 1.2s ease, visibility 1.2s ease, top 1.1s ease;
+    contain: layout style;
 }
 .train.is-visible { opacity: 1; visibility: visible; }
 
@@ -42,30 +43,14 @@
     width: 100%;
     height: 100%;
     z-index: 1;
-    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .55));
 }
 
 /* Toa nối phía sau — vị trí do train.js đặt (phụ thuộc số toa),
    ở đây chỉ khai báo phần dùng chung.
-   Mask cắt bỏ cụm bánh đĩa vẽ sẵn ở đáy ảnh (mép dưới khung gầm nằm ở
-   y = 582/1024 = 56.8%), vì đã thay bằng bánh nan hoa kiểu đầu tàu. */
-.train__carriage {
-    z-index: 0;
-    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .55));
-    mask-image: linear-gradient(to bottom, #000 56.4%, transparent 57.4%);
-    -webkit-mask-image: linear-gradient(to bottom, #000 56.4%, transparent 57.4%);
-}
-
-/* Gầm toa vốn tối gần bằng nền cầu. Lớp này là bản sao cùng vị trí,
-   chỉ lộ dải khung gầm rồi làm sáng lên cho nổi khỏi nền. */
-.train__carriage-lit {
-    filter: brightness(1.8) saturate(1.2);
-    mask-image: linear-gradient(to bottom, transparent 50%, #000 53.5%,
-                                #000 56.4%, transparent 57.4%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 50%, #000 53.5%,
-                                        #000 56.4%, transparent 57.4%);
-    z-index: 0;
-}
+   Bóng đổ, đường cắt bỏ cụm bánh đĩa vẽ sẵn ở đáy ảnh và dải gầm toa được
+   làm sáng đều đã NƯỚNG SẴN vào train-carriage.webp: filter và mask trên lớp
+   đang rung mỗi khung hình là thứ ngốn GPU nhất trên điện thoại. */
+.train__carriage { z-index: 0; }
 
 /* Bánh toa: cùng bộ khung bánh với đầu tàu nhưng nằm SAU thân toa,
    chỉ hở đúng nửa dưới — khác đầu tàu là bánh đè lên thân. */
@@ -85,6 +70,9 @@
 
 /* Khung số 5 được vẽ nhỏ hơn bốn khung kia ~3%, chỉnh lại cho bánh khỏi giật */
 .train__wheel--5 { transform: translate(-0.06%, 0.43%) scale(1.031); }
+
+/* Hạ tầng quét/vẽ: tàu chưa hiện thì dừng mọi animation bên trong */
+.train:not(.is-visible) * { animation-play-state: paused; }
 
 /* Rung nhẹ khi tàu đang lăn bánh */
 .train.is-running .train__body { animation: train-chug .32s ease-in-out infinite; }

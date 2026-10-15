@@ -42,7 +42,7 @@ App.config = {
      * Thứ tự trong mảng không quan trọng, loader tự sắp theo ngày.
      */
     days: [
-        '2026-28-06'
+        '2026-18-10'
     ],
 
     frames: {
@@ -88,11 +88,56 @@ App.config = {
         distancePerFrame: 34   // vuốt bao nhiêu px thì bánh xe sang khung kế tiếp
     },
 
+    // Tiếng tàu chạy: lặp liền mạch chừng nào tàu còn lăn bánh (tự chạy hay tự vuốt)
+    sound: {
+        src: 'assets/audio/train-sound.mp3',
+        volume: 0.6,      // 0 → 1
+        fadeIn: 350,      // ms nhỏ → to khi tàu rục rịch
+        fadeOut: 500      // ms to → nhỏ khi tàu dừng
+    },
+
     // Lá thư lịch hẹn hiện ra khi tàu dừng ở trạm; nội dung khai ở `letter` trong day.js
     letter: {
         paper: 'assets/images/letter/paper.webp',
+        shadow: 'assets/images/letter/paper-shadow.webp',
         pen: 'assets/images/letter/pen.webp',
-        tip: 'Chạm ra ngoài tờ thư để đóng 💛'
+        tip: 'Chạm ra ngoài tờ thư để đóng 💛',
+        // Viết xong, đợi chừng này ms cho người xem đọc rồi mới bật popup xác nhận
+        askDelay: 1500,
+        // Sau khi trả lời: con dấu tròn đóng lên thư, kèm lời nhắn bên dưới
+        stamp: 'Đã đồng ý',
+        note: 'Đã quá hú hú em iu ơi',
+
+        // Cuộc săn nút Từ chối: nút Đồng ý hiện rõ dưới thư, nút Từ chối thì ngụy trang trên
+        // tờ giấy (chỗ giấu ngẫu nhiên, lưu localStorage). Đường nào cũng ra đồng ý.
+        // Nản thì sau `giveUpAfter` ms mới có dòng "không tìm thấy nút".
+        hunt: {
+            accept: 'Đồng ý',
+            decline: 'Từ chối',
+            giveUp: 'Không tìm thấy nút từ chối? 🔍',
+            giveUpAfter: 9000,
+            // Dòng gợi ý trên đỉnh màn hình suốt cuộc săn nút
+            hint: 'Nút từ chối được giấu trong lá thư — hãy đi tìm nếu bạn muốn từ chối cuộc hẹn này'
+        }
+    },
+
+    // Popup xác nhận buổi hẹn: nút Đồng ý hiện rõ; muốn từ chối thì bấm "đi tìm nút" —
+    // popup đóng lại và người xem phải săn nút Từ chối đã ngụy trang trên lá thư.
+    rsvp: {
+        title: 'Xác nhận buổi hẹn',
+        body: 'Bạn có đồng ý tham gia buổi hẹn <em>ngày 18-10-2026</em> không? '
+            + 'Muốn từ chối thì tự đi tìm nút nhé 😌',
+        accept: 'Đồng ý',
+        seek: 'Đi tìm nút từ chối 🔍'
+    },
+
+    // Nút xoay ngang cho điện thoại cầm dọc
+    rotate: {
+        label: 'Xoay ngang',
+        title: 'Xoay ngang điện thoại nhé',
+        body: 'Hành trình là một dải tranh dài, cầm ngang xem sẽ trọn vẹn hơn nhiều.',
+        ios: 'iPhone không tự xoay được? Mở Trung tâm điều khiển, tắt “Khoá hướng dọc”, rồi xoay máy ngang.',
+        confirm: 'Đã hiểu'
     },
 
     boardModal: {

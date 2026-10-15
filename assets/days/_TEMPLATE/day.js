@@ -35,8 +35,10 @@ App.Days.register({
     },
 
     // Lịch hẹn hiện trên lá thư khi tàu dừng ở trạm này; bỏ trống thì không có thư.
-    // style: "greet" (dòng chào, chữ to hơn) | "sign" (chữ kí, thụt vào) | bỏ trống
+    // style: "greet" (dòng chào, chữ to hơn) | "date" (nơi, ngày viết, góc phải trên) |
+    //        "sign" (chữ kí, thụt vào) | bỏ trống
     "letter": [
+        { "text": "Hà Nội, ngày 1 tháng 1 năm 2026", "style": "date" },
         { "text": "Gửi Luyna thân iu,", "style": "greet" },
         { "text": "18h45 : Việc đầu tiên" },
         { "text": "Kí tên: Kong Tien", "style": "sign" }

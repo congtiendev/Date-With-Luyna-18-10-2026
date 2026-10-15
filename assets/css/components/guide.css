@@ -2,22 +2,24 @@
 .guide {
     position: fixed;
     left: 50%;
-    bottom: 34px;
+    bottom: calc(34px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     gap: 16px;
     padding: 12px 26px 12px 30px;
     border-radius: 999px;
-    background: rgba(8, 14, 32, .58);
+    background: rgba(8, 14, 32, .82);
     border: 1px solid rgba(240, 198, 116, .3);
     box-shadow: 0 6px 30px rgba(0, 0, 0, .45);
-    backdrop-filter: blur(8px);
     color: var(--gold-soft);
     font-family: var(--font-serif);
     font-size: clamp(14px, 2.6vw, 19px);
     letter-spacing: .05em;
-    white-space: nowrap;
+    /* Màn hẹp (điện thoại dọc): xuống dòng thay vì tràn ra hai mép */
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    text-align: center;
     z-index: 25;
     opacity: 0;
     visibility: hidden;
@@ -25,9 +27,10 @@
     pointer-events: none;
 }
 .guide.is-visible { opacity: 1; visibility: visible; }
+.guide:not(.is-visible) * { animation-play-state: paused; }
 
 /* Khi có nút điều khiển ở đáy thì dải hướng dẫn nhường chỗ, lùi lên trên */
-.guide.is-raised { bottom: 104px; }
+.guide.is-raised { bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
 
 .guide__hand {
     font-size: 1.3em;
@@ -48,4 +51,14 @@
 @keyframes guide-nudge {
     0%, 100% { transform: translateX(0);    opacity: .5; }
     50%      { transform: translateX(10px); opacity: 1; }
+}
+
+/* Điện thoại cầm ngang: màn thấp, dải hướng dẫn đặt ở đáy sẽ đè lên đầu tàu —
+   đẩy lên đỉnh màn hình */
+@media (max-height: 520px) and (orientation: landscape) {
+    .guide,
+    .guide.is-raised {
+        bottom: auto;
+        top: calc(12px + env(safe-area-inset-top, 0px));
+    }
 }

@@ -4,7 +4,7 @@
  * khỏi mảng `days` trong assets/js/config.js.
  */
 App.Days.register({
-    "date": "2026-06-28",
+    "date": "2026-10-18",
 
     "title": "Trạm đầu tiên",
     "subtitle": "Ngày mẫu — thay bằng kỉ niệm thật",
@@ -31,8 +31,10 @@ App.Days.register({
     },
 
     // Lịch hẹn hiện trên lá thư khi tàu dừng ở trạm này.
-    // style: "greet" (dòng chào, chữ to hơn) | "sign" (chữ kí, thụt vào) | bỏ trống
+    // style: "greet" (dòng chào, chữ to hơn) | "date" (nơi, ngày viết, góc phải trên) |
+    //        "sign" (chữ kí, thụt vào) | bỏ trống
     "letter": [
+        { "text": "Hà Nội, ngày 15 tháng 10 năm 2026", "style": "date" },
         { "text": "Gửi Luyna thân iu,", "style": "greet" },
         { "text": "17h00 : Anh đón em" },
         { "text": "18h00 : Ăn tối tại La Libra Steak - Lạc Long Quân" },

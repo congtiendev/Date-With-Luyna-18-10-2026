@@ -7,6 +7,7 @@ không cần server — script để ở dạng classic nên `file://` vẫn n�
 
 ```
 index.html                      vỏ trang, chỉ chứa <div id="app"> và các thẻ script
+sw.js                           service worker — cache ảnh/mã cho lần mở sau
 assets/
 ├── css/
 │   ├── main.css                điểm gom, @import các phần bên dưới
@@ -16,6 +17,8 @@ assets/
 │       ├── progress.css        vạch tiến độ trên đỉnh
 │       ├── guide.css           dải hướng dẫn vuốt
 │       ├── modal.css           popup khung tranh + vị trí nút trên tấm biển vàng
+│       ├── rotate.css          nút xoay ngang + hướng dẫn xoay (chỉ máy cảm ứng cầm dọc)
+│       ├── rsvp.css            popup xác nhận
 │       ├── letter.css          lá thư lịch hẹn + chỗ chữ trên tờ giấy
 │       ├── train.css           đầu tàu + bánh xe đặt trên đường ray
 │       ├── smoke.css           cột khói trên ống khói
@@ -30,6 +33,11 @@ assets/
 │   │   ├── progress.js         Progress — set(0..1)
 │   │   ├── guide.js            Guide — show / hide / flash / nhắc khi đứng yên
 │   │   ├── modal.js            Modal — dựng popup từ ảnh khung + danh sách nút
+│   │   ├── rsvp.js             Rsvp — popup "đi tìm nút" (cuộc săn nút nằm ở letter.js)
+│   │   ├── rotate.js           Rotate — nút xoay ngang + hướng dẫn xoay
+│   │   ├── device.js           Device — chặn zoom và những chỗ riêng của iOS
+│   │   ├── sound.js            Sound — tiếng tàu chạy, lặp và vào/ra êm
+│   │   ├── preload.js          Preload — giải mã sẵn ảnh lúc máy rảnh
 │   │   ├── letter.js           Letter — thư bay ra khi tàu dừng, bút viết lịch hẹn
 │   │   ├── train.js            Train — đổi pha bánh xe theo quãng đường đã vuốt
 │   │   ├── smoke.js            Smoke — cột khói, đổi dáng và ngả theo nhịp tàu
@@ -42,7 +50,8 @@ assets/
 │   ├── frames/                 ảnh khung popup (1536×1024)
 │   ├── locomotive.webp         thân đầu tàu (1536×1024)
 │   ├── train-carriage.webp     toa nối phía sau (1536×1024)
-│   ├── letter/                 paper.webp (tờ giấy 1024×1536) + pen.webp (cây bút)
+│   ├── audio/                  train-sound.mp3 — tiếng tàu chạy (10,5 giây, lặp)
+│   ├── letter/                 paper.webp (1024×1536), paper-shadow.webp (bóng đổ), pen.webp (đã nướng bóng)
 │   ├── train-wheels/           5 khung bánh xe (1536×1024)
 │   └── smoke/                  3 dáng cột khói (768×1152): 3, 4, 6
 └── days/                       mỗi trạm dừng là một ngày, một thư mục
@@ -242,7 +251,7 @@ Thứ tự khai báo trong `config.days` không quan trọng — loader tự s�
 | `story` | không | mảng các đoạn văn; viết một chuỗi cũng được |
 | `scene` | không | trạm nằm trên cảnh nào (khoá trong `config.scenes`) |
 | `position` | không | 0 → 1, vị trí dọc theo chiều dài cảnh |
-| `letter` | không | lịch hẹn viết trên lá thư khi tàu dừng ở trạm: `[{ text, style }]`, `style` là `greet` / `sign` / bỏ trống |
+| `letter` | không | lịch hẹn viết trên lá thư khi tàu dừng ở trạm: `[{ text, style }]`, `style` là `greet` / `date` / `sign` / bỏ trống |
 | `photos` | không | `"photos/01.webp"` hoặc `{ src, caption }` |
 | `station` | không | nhà ga của trạm, xem bên dưới |
 | `id` | không | mặc định lấy tên thư mục |
@@ -264,8 +273,8 @@ Thứ tự khai báo trong `config.days` không quan trọng — loader tự s�
   giữa ảnh 1 và ảnh 2. Nhà ga đứng ngay mối nối vừa hợp cảnh vừa che luôn chỗ ghép.
 - `sign` — vùng lòng biển hiệu để khắc chữ lên, tính theo tỉ lệ của chính ảnh ga:
   `{ "x": 0.4883, "y": 0.4214, "width": 0.1432, "height": 0.0459 }`.
-  Chữ mặc định là **ngày của trạm** đổi sang cách đọc Việt (`2026-06-28` →
-  `28-6-2026`); muốn chữ khác thì thêm `"text"` vào trong `sign`.
+  Chữ mặc định là **ngày của trạm** đổi sang cách đọc Việt (`2026-10-18` →
+  `18-10-2026`); muốn chữ khác thì thêm `"text"` vào trong `sign`.
   Lòng bảng chỉ rộng 14.3 % bề ngang ảnh nên cỡ chữ phải nhỏ
   (`.034 × chiều cao ảnh ga` trong `stage.css`), để to hơn là tràn ra ngoài khung.
 - Toạ độ ngang được `stage.layoutProps()` **đo thật** sau khi ảnh tải xong và mỗi lần
@@ -325,6 +334,50 @@ nhìn thấy trọn nhà ga. Vì vậy đoàn tàu được đặt lệch trái 
 `"content": { "left": 0.0716, "right": 0.9290 }` — không có số này thì tàu
 dừng hụt mất gần 42px.
 
+## Điện thoại: nút xoay ngang và tối ưu cho iOS
+
+**Nút "Xoay ngang"** (`App.Rotate`) hiện ở góc phải trên, chỉ khi máy cảm ứng đang cầm
+dọc (`@media (pointer: coarse) and (orientation: portrait)`); xoay ngang là nút tự ẩn.
+- **Android:** bấm nút → vào toàn màn hình rồi `screen.orientation.lock('landscape')`,
+  máy tự xoay.
+- **iPhone:** Safari không cho khoá hướng và không có toàn màn hình cho trang web, nên
+  nút hiện hướng dẫn: cầm ngang, và nếu máy không xoay thì tắt "Khoá hướng dọc" trong
+  Trung tâm điều khiển. Hướng dẫn tự đóng ngay khi máy xoay ngang.
+- Chữ chỉnh ở `config.rotate`.
+
+**Riêng cho iOS Safari:**
+
+| Vấn đề | Cách xử lý |
+|---|---|
+| Tai thỏ / thanh Home che nút | `viewport-fit=cover` + `env(safe-area-inset-*)` cho dải hướng dẫn, nút Khởi hành, nút xoay, popup, thanh tiến độ |
+| Kéo xuống thì trang "đàn hồi" lộ nền, thanh địa chỉ co giãn làm trang nhảy | `body` ghim cứng (`position: fixed; inset: 0`), `overscroll-behavior: none`; chiều cao dùng `dvh` (có dự phòng `vh`) |
+| Zoom bằng hai ngón / chạm đúp phá bố cục (iOS bỏ qua `user-scalable=no`) | `App.Device`: chặn `gesturestart`, chạm đúp; `touch-action: manipulation` |
+| Nháy xám khi chạm, menu "Lưu ảnh" khi giữ lâu | `-webkit-tap-highlight-color: transparent`, `-webkit-touch-callout: none` |
+| Tiếng tàu bị chặn: iOS chỉ cho `play()` trong đúng lần chạm, mà tiếng bật từ chuyển động cuộn | Lần chạm đầu tiên phát thử một nhịp **câm** rồi dừng — từ đó trang phát tiếng lúc nào cũng được |
+| iOS bỏ qua việc chỉnh `audio.volume` | Tiếng vào/ra dứt khoát hơn (không fade); bật/tắt vẫn đúng |
+| Safari < 16 chưa có đơn vị `cqw` (chữ trong popup mất cỡ) | Mỗi dòng `cqw` có sẵn dòng dự phòng bằng `vw` ngay phía trên |
+| Thêm vào Màn hình chính | Có `apple-mobile-web-app-capable` + `black-translucent`: mở như app, không còn thanh địa chỉ |
+| Dải hướng dẫn tràn hai mép khi cầm dọc / đè lên đầu tàu khi cầm ngang | Cho xuống dòng, và dời lên đỉnh màn khi cầm ngang (màn thấp) |
+
+Chưa thử trên iPhone thật — chỉ giả lập khung màn hình điện thoại bằng Chrome.
+
+## Tiếng tàu chạy
+
+`App.Sound` phát `assets/audio/train-sound.mp3` **lặp liên tục chừng nào tàu còn
+lăn bánh**. Nó bám theo chính chuyển động của tàu (`Train.onMotion`, bật khi bánh
+xe bắt đầu quay, tắt khi dừng quá 180 ms) nên cả hai trường hợp đều có tiếng:
+tàu tự chạy tới trạm và người xem tự vuốt.
+
+- Vào/ra bằng nhịp tăng/giảm âm lượng (`fadeIn` 350 ms, `fadeOut` 500 ms) để khỏi
+  cụt tiếng; dừng thì giữ nguyên chỗ đang phát, lần chạy sau nối tiếp.
+- Chuyển tab thì tạm dừng, quay lại mà tàu còn chạy thì phát tiếp.
+- Chỉnh âm lượng và nhịp ở `config.sound`.
+- Trình duyệt chặn âm thanh tới khi người xem bấm vào trang; luồng này luôn có
+  lần bấm **Sẵn sàng** trước khi tàu chạy nên không vướng. iOS bỏ qua việc chỉnh
+  âm lượng nên ở đó tiếng vào/ra dứt khoát hơn.
+- File mp3 được trình duyệt xin từng khúc (Range), nên `sw.js` cố ý **không** cache
+  loại yêu cầu này.
+
 ## Lá thư lịch hẹn
 
 Tàu dừng ở trạm nào có khai `letter` trong `day.js` thì sau `timing.letterDelay`
@@ -337,6 +390,54 @@ Mỗi dòng là một khối `overflow: hidden`, JS nới dần bề rộng đ�
 nét bút và dời cây bút tới đúng chỗ đang viết. Cỡ chữ tự co sao cho dòng dài
 nhất vừa tờ giấy. Tham số bút nằm ở `App.Letter.PEN_TIP` (vị trí đầu ngòi) và
 `App.Letter.HOP` (thời gian nhấc bút sang dòng mới).
+
+### Popup xác nhận rồi săn nút Từ chối trên thư
+
+Thư viết xong, **1,5 giây sau** (`config.letter.askDelay`) một popup bật lên (`App.Rsvp`,
+`rsvp.js`): hỏi có đồng ý buổi hẹn không, nút **Đồng ý** hiện rõ trên tấm biển vàng, và dòng
+**"Đi tìm nút từ chối 🔍"** dưới khung. Khung được phóng rộng tới 118% bề ngang màn (phần vẽ
+chỉ chiếm ~79% ảnh) nên trên điện thoại chữ không bị nhỏ. **Mọi đường đều dẫn tới Đồng ý:**
+
+- Bấm **Đồng ý** (trong popup) → con dấu đóng xuống thư.
+- Bấm **Đi tìm nút từ chối** → popup đóng lại, cuộc săn nút bắt đầu trên chính lá thư
+  (`Letter.startHunt()`). Nút **Đồng ý** hiện rõ dưới thư; trên tờ giấy thì **giấu hai nút bé
+  tí** (vẽ cỡ thường rồi thu nhỏ 32 lần, hạt ~3 × 1,3 px) trong **hai khe rách khác nhau ở mép
+  giấy** (`App.Letter.NOTCHES`, dò từ kênh alpha của `paper.webp`, chỉ lấy khe đủ rộng để nút
+  lọt hẳn vào), tô đúng màu nền tối nên chìm vào khoảng trống.
+- Suốt cuộc săn nút có **dòng gợi ý trên đỉnh màn hình** (`config.letter.hunt.hint`): *"Nút từ chối
+  được giấu trong lá thư — hãy đi tìm nếu bạn muốn từ chối cuộc hẹn này"*. Dòng này ẩn đi khi camera
+  zoom.
+- **Cặp khe** được chọn ngẫu nhiên và **lưu `localStorage`** (`kt-luyna:notches`) nên chơi lại
+  vẫn đúng hai khe đó. Xoá khoá này để đổi chỗ.
+- Mò ra một trong hai khe và bấm trúng → camera **zoom 32 lần** tới, nút lộ ra là **"Đồng ý"**;
+  rồi zoom ra, lao sang khe còn lại: ở đó mới là nút **"Từ chối"** ("nút từ chối ở đây cơ
+  mà") — nhưng đã đồng ý rồi → đóng dấu.
+- Nản: sau **9 giây** (`config.letter.hunt.giveUpAfter`) dòng **"Không tìm thấy nút từ chối? 🔍"**
+  mới hiện ra. Bấm vào là đồng ý, RỒI camera mới zoom tới khe có nút "Từ chối" cho xem.
+- Trả lời xong, **con dấu tròn "ĐÃ ĐỒNG Ý"** đóng xuống khoảng trống dưới chữ ký (không che
+  tên). Chưa trả lời thì thư không đóng được.
+- **Đóng thư là tải lại trang** (`App.Letter.CLOSE_RELOAD_MS` chờ thư mờ hẳn rồi `location.reload()`),
+  nên mọi thứ quay về ban đầu.
+- Trạng thái trả lời chỉ nằm trong bộ nhớ của phiên; **chỉ có chỗ giấu nút Từ chối** được lưu vào
+  trình duyệt. Sự kiện `letter:answer` phát trên `document` với `detail.how` là
+  `accept` / `giveUp` / `found`.
+
+Chữ của popup chỉnh ở `config.rsvp`, của cuộc săn nút ở `config.letter.hunt`, nhịp zoom ở
+`App.Letter.ZOOM_*`. Zoom đúng 32 lần mới trả nút về cỡ thật, nên đổi
+`App.Letter.TINY_SCALE` thì phải đổi cả `scale(.03125)` trong `.letter__tiny`. Đổi ảnh giấy
+thì phải dò lại `App.Letter.NOTCHES`.
+
+### Chế độ thử: bỏ qua đoạn tàu chạy
+
+Thêm vào địa chỉ trang, khỏi phải vuốt, lên tàu, chờ tàu vào ga:
+
+| Địa chỉ | Làm gì |
+|---|---|
+| `index.html?test=letter` | thư mở ra, bút viết, rồi popup xác nhận bật lên |
+| `index.html?test=rsvp` | thư hiện sẵn đủ chữ, popup xác nhận bật lên gần như tức thì |
+
+Dùng ngày đầu tiên có khai `letter`. Tải lại trang là thử lại từ đầu (vì không lưu gì
+vào trình duyệt). Không có tham số này thì trang chạy như bình thường.
 
 ## Ảnh: vì sao toàn `.webp`
 
@@ -353,12 +454,14 @@ nhân đôi cho màn Retina:
 | Nhóm | Cỡ | Chất lượng |
 |---|---|---|
 | `scenes/` | giữ 2172×724 — chạy full màn hình, ảnh gốc vốn đã phải phóng to | 80 |
-| `frames/` | giữ 1536×1024 — popup rộng tối đa 780 px CSS | 82 |
-| đầu tàu, toa, bánh xe | giữ 1536×1024 — cao tối đa `36vh` | 80 |
-| `smoke/` | 1024×1536 → **768×1152** — cao tối đa bằng khung tàu | 80 |
-| nhà ga | giữ 1536×1024 — cao tối đa `48vh` | 82 |
+| `frames/` | 1536×1024 → **1280×853** — popup rộng tối đa 780 px CSS | 82 |
+| đầu tàu, toa | 1536×1024 → **1280×853** | 80 |
+| bánh xe | 1536×1024 → **768×512** — chỉ rộng 64% đầu tàu (28% trên toa) | 80 |
+| `smoke/` | 768×1152 → **576×864** — cao tối đa bằng khung tàu | 78 |
+| nhà ga | 1536×1024 → **1152×768** — cao tối đa `48vh` | 82 |
 
-Khói bị **thu nhỏ** nhưng không lệch một li: mọi toạ độ trong
+Thu nhỏ **đều cả hai chiều** nên mọi toạ độ phần trăm trong CSS vẫn đúng. Khói
+bị thu nhỏ nhưng không lệch một li: mọi toạ độ trong
 `App.Smoke.ROOTS` đều là **tỉ lệ 0→1** chứ không
 phải số pixel, nên đổi cỡ ảnh không phải sửa gì. Các con số pixel còn sót trong
 chú thích code (`y 282..1126`, `1205/1536`…) là đo trên **khung gốc**, giữ lại
@@ -378,3 +481,36 @@ python3 tools/optimize-images.py --write --delete-originals
 
 Ảnh PNG gốc vẫn nằm trong lịch sử git (commit `e9ad01a`), cần thì lấy lại được:
 `git checkout e9ad01a -- assets/images/`.
+
+## Chống giật trên điện thoại
+
+Cảnh này chạy tốn nhất ở **bộ nhớ ảnh đã giải mã** và các **hiệu ứng làm mờ**
+(`filter`, `backdrop-filter`) chạy lại **mỗi khung hình** trên lớp đang chuyển
+động. Đã xử lý:
+
+| Vấn đề | Cách xử lý |
+|---|---|
+| `drop-shadow` trên đầu tàu và toa — hai lớp này rung liên tục lúc tàu chạy, GPU làm mờ lại mỗi khung | **Nướng bóng đổ vào ảnh** (`locomotive.webp`, `train-carriage.webp`) |
+| Toa dùng 2 ảnh chồng nhau + `mask` + `filter: brightness` để cắt bánh vẽ sẵn và làm sáng gầm | Gộp thành **một ảnh** đã nướng sẵn; bớt 2 lớp và 2 bộ lọc |
+| Bánh xe 1536×1024 × 5 khung (dùng chung cho đầu tàu và 2 toa) | Thu còn 768×512: bộ nhớ giải mã từ ~31 MB xuống ~8 MB |
+| `filter: drop-shadow` trên cả tờ thư — mỗi nét bút viết ra lại làm mờ cả tờ giấy | Bóng đổ tách thành ảnh nhỏ tĩnh `paper-shadow.webp`; bóng cây bút nướng vào `pen.webp` |
+| `backdrop-filter: blur` toàn màn hình (popup, thư) và trên dải hướng dẫn / nút | Bỏ; tăng độ đậm nền cho khỏi lộ phía sau |
+| Animation vô hạn (khói, dải hướng dẫn) vẫn chạy khi đã ẩn | `animation-play-state: paused` khi chưa hiện |
+| Ảnh sau `visibility: hidden` chỉ giải mã khi hiện → khựng đúng lúc chuyển cảnh | `Preload` giải mã sẵn **lần lượt từng ảnh** lúc máy rảnh; thẻ ảnh để `decoding="async"` |
+
+Bóng đổ nướng theo cỡ khung ảnh nên **co giãn theo cỡ tàu** — trên điện thoại bóng
+nhỏ lại cùng tàu, trước đây bóng cố định theo pixel nên trông to quá.
+
+### Cache cho lần mở sau
+
+`sw.js` (service worker) giữ ảnh và mã trong cache của trình duyệt: lần mở thứ hai
+gần như không tải gì. GitHub Pages không cho tự đặt header cache nên cách duy nhất
+là qua service worker.
+
+- Ảnh, font: **cache-first** — có sẵn thì dùng luôn.
+- HTML / JS / CSS: **stale-while-revalidate** — hiện bản cache ngay, ngầm tải bản
+  mới cho lần sau.
+- **Thay ảnh mà giữ nguyên tên file thì phải đổi `VERSION` trong `sw.js`**, không
+  thì người đã từng vào vẫn thấy ảnh cũ. Thêm ảnh mới vào `PRECACHE` nếu muốn
+  tải sẵn lúc cài.
+- Chỉ chạy qua `http(s)`; mở thẳng `file://` thì bỏ qua, trang vẫn chạy bình thường.

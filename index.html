@@ -2,12 +2,24 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- viewport-fit=cover: tràn hết màn hình iPhone có tai thỏ, chừa lề bằng env(safe-area-inset-*) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0f1e">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Thêm vào Màn hình chính của iPhone thì mở như một app, không còn thanh địa chỉ -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="KongTien X Luyna">
     <title>KongTien X Luyna</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Be+Vietnam+Pro:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- Ảnh nền của màn đầu: tải ngay, không chờ JS dựng thẻ img -->
+    <link rel="preload" as="image" href="assets/images/scenes/welcome-bg.webp" type="image/webp" fetchpriority="high">
 
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -27,7 +39,20 @@
     <script src="assets/js/components/control.js"></script>
     <script src="assets/js/components/modal.js"></script>
     <script src="assets/js/components/letter.js"></script>
+    <script src="assets/js/components/rsvp.js"></script>
     <script src="assets/js/components/veil.js"></script>
+    <script src="assets/js/components/preload.js"></script>
+    <script src="assets/js/components/sound.js"></script>
+    <script src="assets/js/components/rotate.js"></script>
+    <script src="assets/js/components/device.js"></script>
     <script src="assets/js/app.js"></script>
+    <script>
+        // Cache ảnh/mã cho lần mở sau — chỉ chạy được qua http(s), mở file:// thì bỏ qua
+        if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+    </script>
 </body>
 </html>
