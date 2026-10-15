@@ -146,11 +146,7 @@ App.Smoke.GEOMETRY = {
  * trong config cũng không làm cột khói lệch khỏi ống khói.
  */
 App.Smoke.ROOTS = {
-    '1.webp': { x: 0.4980, y: 0.8542 },
-    '2.webp': { x: 0.4946, y: 0.8835 },
     '3.webp': { x: 0.4902, y: 0.8457 },
     '4.webp': { x: 0.4873, y: 0.8652 },
-    '5.webp': { x: 0.4902, y: 0.8132 },
-    '6.webp': { x: 0.4941, y: 0.8522 },
-    '7.webp': { x: 0.5010, y: 0.8333 }
+    '6.webp': { x: 0.4941, y: 0.8522 }
 };

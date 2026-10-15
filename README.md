@@ -44,7 +44,7 @@ assets/
 │   ├── train-carriage.webp     toa nối phía sau (1536×1024)
 │   ├── letter/                 paper.webp (tờ giấy 1024×1536) + pen.webp (cây bút)
 │   ├── train-wheels/           5 khung bánh xe (1536×1024)
-│   └── smoke/                  7 dáng cột khói (768×1152), đang dùng 3, 4, 6
+│   └── smoke/                  3 dáng cột khói (768×1152): 3, 4, 6
 └── days/                       mỗi trạm dừng là một ngày, một thư mục
     ├── _TEMPLATE/              mẫu để chép ra khi thêm ngày mới
     │   ├── day.js
@@ -104,10 +104,10 @@ cột luôn dính liền ống khói, chỉ đổi dáng và lắc lư.
 
 - Điểm neo `.smoke` đặt đúng miệng ống khói: **x = 1205/1536, y = 138/1024**
   trong khung `.train`.
-- **Chỉ dùng 3 trong 7 dáng: `3.webp`, `4.webp`, `6.webp`.** Chọn bằng cách canh gốc
-  mọi ảnh về cùng một điểm rồi so từng cặp — bộ 3-4-6 lệch nhau **9.2**, các bộ khác
-  12–20. Ba dáng gần giống nhau nên đổi qua lại trông như khói cuộn tại chỗ;
-  dùng cả 7 dáng thì cột khói đổi hình thấy rõ, rất xấu.
+- **Chỉ giữ 3 dáng: `3.webp`, `4.webp`, `6.webp`** (chọn từ bộ 7 dáng gốc). Chọn bằng
+  cách canh gốc mọi ảnh về cùng một điểm rồi so từng cặp — bộ 3-4-6 lệch nhau **9.2**,
+  các bộ khác 12–20. Ba dáng gần giống nhau nên đổi qua lại trông như khói cuộn tại chỗ;
+  dùng nhiều dáng khác nhau thì cột khói đổi hình thấy rõ, rất xấu.
 - Gốc cột mỗi ảnh nằm lệch nhau chút ít (y từ 0.813 đến 0.884), nên `App.Smoke.ROOTS`
   ghi gốc thật của từng ảnh và bù riêng cho từng dáng — không có bảng này thì
   đổi dáng xong cột khói sẽ rời khỏi ống khói. Bảng tra theo **tên file**, nên
@@ -158,7 +158,6 @@ trong `Train.travel()`, nên cả đoàn lăn đồng bộ.
 - Đổi chữ, đổi ảnh, chỉnh thời lượng hiệu ứng: sửa `assets/js/config.js`.
 - Thêm cảnh mới: khai báo thêm trong `config.scenes`, tạo `new App.Stage(...)`
   trong `app.js` rồi gọi `goToStage(stageMới, 'lời hướng dẫn')`.
-  Ảnh `De-sterrennacht-2.webp` và `-3.webp` đã có sẵn trong `assets/images/scenes/`.
 
 ## Ghép nhiều ảnh thành một dải liền
 
